@@ -9,18 +9,31 @@ Que se encargara de ejecutar el comando nvme seleccionado y retornara una respue
 Los comandos requeridos son:
 
 TEST 1: 
+
   -nvme id-ctrl
+  
 TEST 2: 
+
   -nvme smart-log (Via admin-pasthru)
+  
   -nvme read
+  
   -nvme write
+  
   -nvme set features
+  
 TEST 3: 
+
   -nvme id-ns (Via admin-pasthru)
+  
   -nvme delete-ns
+  
   -nvme create-ns
+  
   -nvme attach-ns
+  
   -Change the blocksize of the drive (No recuerdo con que comando se podia esto)
+  
   -nvme write (repetido)
   
 
