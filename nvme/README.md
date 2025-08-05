@@ -6,9 +6,9 @@ run_command()
 
 Que se encargara de ejecutar el comando nvme seleccionado y retornara una respuesta a partir de ello.
 
-Los comandos requeridos son:
+Los comandos requeridos son (Los agrupe por los test cases, pero todos van agrupados en una clase para su declaracion):
 
-TEST 1: 
+TEST 1:
 
   -nvme id-ctrl
   
