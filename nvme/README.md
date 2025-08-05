@@ -1,0 +1,1 @@
+El Wrapper es un componente que encapsula piezas de codigo, librerias o un sistema, proporcionando una interfaz para facilitar la interaccion o modificar su comportamiento, es un intermediario, abstrayendo la complejidad y en ciertos casos, agregando funcionalidad.
