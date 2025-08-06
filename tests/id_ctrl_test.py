@@ -25,9 +25,9 @@ class TestIdCtrl():
       if key == "sn" or key == "fguid" or key == "unvmcap" or key == "subnqn":
         pass
       if json[key] != cmd[key]:
-        count++
+        count += 1
         self.logger.debug(f"Error: Expected {json[key]}, Found {cmd[key]}")
-      return count;
+      return count
     
       
 test = TestLogger("test_id_control")
@@ -37,12 +37,12 @@ id_ctrl_test = TestIdCtrl(logger,nvme)
 console = id_ctrl_test.run()
 if console == None:
   logger.debug("ERROR in command")
-  return 0
-errors = id_ctrl_test.validate(json,cmd)
-if errors == 0:
-  logger.debug("TEST PASSED, 0 errors")
 else:
-  logger.debug(f"TEST FAILED, {errors} error(s)")
-return 0  
+  errors = id_ctrl_test.validate(json,cmd)
+  if errors == 0:
+    logger.debug("TEST PASSED, 0 errors")
+  else:
+    logger.debug(f"TEST FAILED, {errors} error(s)")  
 
         
+
