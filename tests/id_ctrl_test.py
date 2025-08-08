@@ -4,6 +4,7 @@ from nvme.nvme_wrapper import NvmeCommands
 ## Datos de nuestro NVME controller
 DEVICE = "/dev/nvme0"
 NVME = "nvme"
+
 ## Datos del resultado del comando id-ctrl que debemos ignorar
 IGNORE_LIST = ['sn', 'fguid', 'unvmcap', 'subnqn']
 
