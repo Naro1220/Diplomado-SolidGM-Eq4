@@ -160,11 +160,11 @@ class TestIdCtrl():
 
     ## Manda el comando id-ctrl en formato json al controlador y guarda el diccionario
     found_log = self.nvme.id_ctrl(json_output=True)
-    self.logger.debug("Using id_ctrl command...")
+    self.logger.info("Using id_ctrl command...")
 
     ## Informa si el comando se ejecuto correctamente
     if found_log != None:
-      self.logger.debug("Command Succeeded")
+      self.logger.info("Command Succeeded")
     return found_log
 
   def validate(self, expected_log, found_log):
@@ -208,3 +208,4 @@ else:
     logger.info(f"TEST FAILED, {errors} error(s)")
   else:
     logger.error("ERROR: Can't validate")
+
