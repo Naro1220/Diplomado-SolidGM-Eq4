@@ -1,9 +1,13 @@
 from logger.log_manager import LogManager
 from nvme.nvme_wrapper import NvmeCommands
 
+## Datos de nuestro NVME controller
 DEVICE = "/dev/nvme0"
 NVME = "nvme"
+## Datos del resultado del comando id-ctrl que debemos ignorar
 IGNORE_LIST = ['sn', 'fguid', 'unvmcap', 'subnqn']
+
+##Resultado de otro NVME controller para comparar
 EXPECTED_LOG = {
   "vid":606,
   "ssvid":606,
@@ -143,44 +147,63 @@ EXPECTED_LOG = {
   ]
 }
 
+## Clase para hacer la prueba
 class TestIdCtrl():
+
+  ## Da nuestro logger y las funciones de NVME a la clase
   def __init__(self, logger, nvme):
     self.logger = logger
     self.nvme = nvme
         
   def run(self):
+
+    ## Manda el comando id-ctrl en formato json al controlador y guarda el diccionario
     found_log = self.nvme.id_ctrl(json_output=True)
     self.logger.debug("Using id_ctrl command...")
+
+    ## Informa si el comando se ejecuto correctamente
     if found_log != None:
       self.logger.debug("Command Succeeded")
     return found_log
 
   def validate(self, expected_log, found_log):
+
+    ## Inicia una cuenta en 0 para los errores y comprueba si los 2 diccionarios son del mismo tamaño
     count = 0
     if (len(expected_log) != len(found_log)):
-      self.logger.debug("ERROR: Can't validate")
-      return None
+      return -1
+    
+    ## Consigue las claves de los diccionarios, los guarda en una lista y elimina las claves que ignoraremos
     keys = list(expected_log.keys())
     for i in range(4):
       keys.remove(IGNORE_LIST[i])
+
+    ## Se mueve de clave en clave, comprueba si los valores son iguales y en dado caso de que no sea asi, lo remarca y lo madnda la cantidad de errores
     for key in keys:
       if expected_log[key] != found_log[key]:
         count += 1
-        self.logger.debug(f"Error: Expected {expected_log[key]}, Found {found_log[key]}")
+        self.logger.errr(f"Error: Expected {expected_log[key]}, Found {found_log[key]}")
     return count
     
-      
+## Inicia el logger y las funciones en un objeto      
 test = LogManager("test_id_control")
 logger = test.get_logger()
 nvme = NvmeCommands(device = DEVICE, logger = logger)
+
+## Crea un objeto con las funciones de esta prueba, y lo corre
 id_ctrl_test = TestIdCtrl(logger,nvme)
 found_log = id_ctrl_test.run()
+
+## Checa si hubo algun error al ejecutar el comando
 if found_log == None:
   logger.error("ERROR in command")
+
+## Compara ambos diccionarios, ve si hubo errores al comparar, o si hubo errores por diferencia de datos
 else:
   errors = id_ctrl_test.validate(EXPECTED_LOG,found_log)
   if errors == 0:
     logger.info("TEST PASSED, 0 errors")
+  if else errors > 0:
+    logger.info(f"TEST FAILED, {errors} error(s)")
   else:
-    logger.info(f"TEST FAILED, {errors} error(s)")     
-
+    logger.error("ERROR: Can't validate")
