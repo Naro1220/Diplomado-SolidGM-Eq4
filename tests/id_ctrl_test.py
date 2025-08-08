@@ -1,8 +1,9 @@
 from logger.log_manager import LogManager
-from nvme_wrapper import NvmeCommands
+from nvme.nvme_wrapper import NvmeCommands
 
 DEVICE = "/dev/nvme0"
 NVME = "nvme"
+IGNORE_LIST = ['sn', 'fguid', 'unvmcap', 'subnqn']
 EXPECTED_LOG = {
   "vid":606,
   "ssvid":606,
@@ -63,7 +64,7 @@ EXPECTED_LOG = {
   "nanagrpid":0,
   "pels":80,
   "domainid":0,
-  "megcap":None,
+  "megcap":0,
   "sqes":102,
   "cqes":68,
   "maxcmd":0,
@@ -159,25 +160,27 @@ class TestIdCtrl():
     if (len(expected_log) != len(found_log)):
       self.logger.debug("ERROR: Can't validate")
       return None
-    for key in expected_log:
-      if key == "sn" or key == "fguid" or key == "unvmcap" or key == "subnqn":
-        pass
+    keys = list(expected_log.keys())
+    for i in range(4):
+      keys.remove(IGNORE_LIST[i])
+    for key in keys:
       if expected_log[key] != found_log[key]:
         count += 1
         self.logger.debug(f"Error: Expected {expected_log[key]}, Found {found_log[key]}")
     return count
     
       
-test = TestLogger("test_id_control")
-logger = testLogger.initialize_logger()
-nvme = NvmeCommands(logger, device = DEVICE, nvme_cli = NVME)
+test = LogManager("test_id_control")
+logger = test.get_logger()
+nvme = NvmeCommands(device = DEVICE, logger = logger)
 id_ctrl_test = TestIdCtrl(logger,nvme)
 found_log = id_ctrl_test.run()
 if found_log == None:
-  logger.debug("ERROR in command")
+  logger.error("ERROR in command")
 else:
   errors = id_ctrl_test.validate(EXPECTED_LOG,found_log)
   if errors == 0:
-    logger.debug("TEST PASSED, 0 errors")
+    logger.info("TEST PASSED, 0 errors")
   else:
-    logger.debug(f"TEST FAILED, {errors} error(s)")     
+    logger.info(f"TEST FAILED, {errors} error(s)")     
+
