@@ -204,7 +204,8 @@ else:
   errors = id_ctrl_test.validate(EXPECTED_LOG,found_log)
   if errors == 0:
     logger.info("TEST PASSED, 0 errors")
-  if else errors > 0:
+  elif errors > 0:
     logger.info(f"TEST FAILED, {errors} error(s)")
   else:
     logger.error("ERROR: Can't validate")
+
