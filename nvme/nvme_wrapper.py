@@ -58,10 +58,29 @@ class NvmeCommands():
 
     def attach_ns(self, json_output=False, verbose=False):
         """
-        Attach a namespace to a controller.
-        
+        Attach a namespace to a controller.        
         """
+    # Mandatory command structure: nvme id-ctrl {device_path}
+        cmd = ["nvme", "attach-ns", self.device, "-n 0", "-c 1" ]
 
+        # Set output format to JSON if requested. 
+        if json_output:
+            cmd.append("-o=json")
+
+        # Execute the command
+        cmd_output = self._execute_cmd(cmd)
+
+        # Parse and convert the JSON formatted string to a dictionary
+        if json_output and cmd_output:
+            try:
+                cmd_output = json.loads(cmd_output)
+            except json.JSONDecodeError:
+                self.logger.error("Failed to parse JSON output from 'attach-ns' command.")
+                self.logger.info(f"Raw output: {cmd_output}")
+                return None
+
+        return cmd_output
+    
     def id_ctrl(self, json_output=False):
         """
         Retrieves the controller identification data of the NVMe device.
@@ -212,5 +231,5 @@ class NvmeCommands():
 logger = LogManager("admin-passthru-test").get_logger()
 nvme = NvmeCommands("/dev/nvme0", logger)
 
-out = nvme.id_ctrl()
+out = nvme.attach_ns()
 print(out)
