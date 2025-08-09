@@ -202,8 +202,58 @@ class NvmeCommands():
         cmd_output = self._execute_cmd(cmd)
 
         return cmd_output
+    def create_ns(self, size, blocksize = 512):
+        
+        cmd = [ "nvme", "create-ns", self.device]
+        
+        calc =str(size // blocksize)
+        
+        nsze = "--nsze=" + calc 
+        ncap = "--ncap=" + calc
+        
+        cmd.append(nsze)
+        cmd.append(ncap)
+        
+        if blocksize == 512:
+            cmd.append("--flbas=0")
+        else:
+            self.logger.error("Error blocksize no valido")
+            return None
+        #siguen mas 
+        
+        # Execute the command
+        cmd_output = self._execute_cmd(cmd)
+        self.logger.info(cmd_output)
+        nsid = ""
+        for char in cmd_output:
+            if char.isdigit():
+                nsid += char
+
+        return nsid
     
-logger = LogManager("admin-passthru-test").get_logger()
+    def attach_ns(self, nsID, controller="0"):
+        """
+        Attach a namespace to a controller.        
+        """
+        if nsID == None:
+            self.logger.error("No se dio nsID")             
+            return False
+        
+    # Mandatory command structure: nvme id-ctrl {device_path}
+        cmd = ["nvme", "attach-ns", self.device]
+        cmd.append(f"-n {nsID}")
+        cmd.append(f"-c {controller}")
+
+        # Execute the command
+        cmd_output = self._execute_cmd(cmd)
+
+        # Parse and convert the JSON formatted string to a dictionary
+        if cmd_output == None:
+            self.logger.error("No se ejecuto el Attach")  
+            return False
+        return True
+    
+logger = LogManager("nvme_wrapper").get_logger()
 nvme = NvmeCommands("/dev/nvme0", logger)
 
 out = nvme.id_ctrl()
