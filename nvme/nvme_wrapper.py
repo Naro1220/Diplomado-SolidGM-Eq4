@@ -55,7 +55,13 @@ class NvmeCommands():
             self.logger.error(f"stderr: {error.stderr}")
 
             return None
+
+    def attach_ns(self, json_output=False, verbose=False):
+        """
+        Attach a namespace to a controller.
         
+        """
+
     def id_ctrl(self, json_output=False):
         """
         Retrieves the controller identification data of the NVMe device.
