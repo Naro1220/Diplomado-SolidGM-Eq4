@@ -56,12 +56,14 @@ class NvmeCommands():
 
             return None
 
-    def attach_ns(self, json_output=False, verbose=False):
+    def attach_ns(self, json_output=True, n=0, c=1):
         """
         Attach a namespace to a controller.        
         """
     # Mandatory command structure: nvme id-ctrl {device_path}
-        cmd = ["nvme", "attach-ns", self.device, "-n 0", "-c 1" ]
+        cmd = ["nvme", "attach-ns", self.device]
+        cmd.append(f"-n={n}")
+        cmd.append(f"-c={c}")
 
         # Set output format to JSON if requested. 
         if json_output:
