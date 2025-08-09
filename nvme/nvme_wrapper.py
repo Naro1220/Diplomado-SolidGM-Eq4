@@ -56,32 +56,27 @@ class NvmeCommands():
 
             return None
 
-    def attach_ns(self, json_output=True, n=0, c=1):
+    def attach_ns(self, nsID, controller="0"):
         """
         Attach a namespace to a controller.        
         """
+        if nsID == None:
+            self.logger.error("No se dio nsID")             
+            return False
+        
     # Mandatory command structure: nvme id-ctrl {device_path}
         cmd = ["nvme", "attach-ns", self.device]
-        cmd.append(f"-n={n}")
-        cmd.append(f"-c={c}")
-
-        # Set output format to JSON if requested. 
-        if json_output:
-            cmd.append("-o=json")
+        cmd.append(f"-n {nsID}")
+        cmd.append(f"-c {controller}")
 
         # Execute the command
         cmd_output = self._execute_cmd(cmd)
 
         # Parse and convert the JSON formatted string to a dictionary
-        if json_output and cmd_output:
-            try:
-                cmd_output = json.loads(cmd_output)
-            except json.JSONDecodeError:
-                self.logger.error("Failed to parse JSON output from 'attach-ns' command.")
-                self.logger.info(f"Raw output: {cmd_output}")
-                return None
-
-        return cmd_output
+        if cmd_output == None:
+            self.logger.error("No se ejecuto el Attach")  
+            return False
+        return True  
     
     def id_ctrl(self, json_output=False):
         """
