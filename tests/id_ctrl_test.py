@@ -1,5 +1,5 @@
-from logger.log_manager import LogManager
-from nvme.nvme_wrapper import NvmeCommands
+from log_manager import LogManager
+from nvme_wrapper import NvmeCommands
 
 ## Datos de nuestro NVME controller
 DEVICE = "/dev/nvme0"
@@ -157,7 +157,7 @@ class TestIdCtrl():
     self.nvme = nvme
         
   def run(self):
-
+    error_count = 0
     ## Manda el comando id-ctrl en formato json al controlador y guarda el diccionario
     found_log = self.nvme.id_ctrl(json_output=True)
     self.logger.info("Using id_ctrl command...")
@@ -165,7 +165,13 @@ class TestIdCtrl():
     ## Informa si el comando se ejecuto correctamente
     if found_log != None:
       self.logger.info("Command Succeeded")
-    return found_log
+    else:
+      self.logger.error("Command Failed")
+      return None
+    
+    ## Valida ambos logs y regresa la cantidad de errores que hubo (-1 sino pudo validad, 0 o mas si hubo)
+    error_count = self.validate(EXPECTED_LOG, found_log)
+    return error_count
 
   def validate(self, expected_log, found_log):
 
@@ -183,29 +189,17 @@ class TestIdCtrl():
     for key in keys:
       if expected_log[key] != found_log[key]:
         count += 1
-        self.logger.errr(f"Error: Expected {expected_log[key]}, Found {found_log[key]}")
+        self.logger.error(f"Error: Expected {expected_log[key]}, Found {found_log[key]}")
     return count
     
 ## Inicia el logger y las funciones en un objeto      
-test = LogManager("test_id_control")
-logger = test.get_logger()
-nvme = NvmeCommands(device = DEVICE, logger = logger)
+##test = LogManager("test_id_control")
+##logger = test.get_logger()
+##nvme = NvmeCommands(device = DEVICE, logger = logger)
 
 ## Crea un objeto con las funciones de esta prueba, y lo corre
-id_ctrl_test = TestIdCtrl(logger,nvme)
-found_log = id_ctrl_test.run()
+##id_ctrl_test = TestIdCtrl(logger,nvme)
+##errors = id_ctrl_test.run()
+##print(errors)
 
-## Checa si hubo algun error al ejecutar el comando
-if found_log == None:
-  logger.error("ERROR in command")
-
-## Compara ambos diccionarios, ve si hubo errores al comparar, o si hubo errores por diferencia de datos
-else:
-  errors = id_ctrl_test.validate(EXPECTED_LOG,found_log)
-  if errors == 0:
-    logger.info("TEST PASSED, 0 errors")
-  elif errors > 0:
-    logger.info(f"TEST FAILED, {errors} error(s)")
-  else:
-    logger.error("ERROR: Can't validate")
 
