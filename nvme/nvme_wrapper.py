@@ -253,7 +253,7 @@ class NvmeCommands():
             return False
         return True
     
-logger = LogManager("admin-passthru-test").get_logger()
+logger = LogManager("nvme_wrapper").get_logger()
 nvme = NvmeCommands("/dev/nvme0", logger)
 
 out = nvme.id_ctrl()
