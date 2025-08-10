@@ -50,7 +50,7 @@ class TestIdCtrl():
     ## Inicia una cuenta en 0 para los errores y comprueba si los 2 diccionarios son del mismo tamaño
     count = 0
     if (len(expected_log) != len(found_log)):
-      return -1
+      return None
     
     ## Consigue las claves de los diccionarios, los guarda en una lista y elimina las claves que ignoraremos
     keys = list(expected_log.keys())
@@ -61,7 +61,7 @@ class TestIdCtrl():
     for key in keys:
       if expected_log[key] != found_log[key]:
         count += 1
-        self.logger.error(f"Error: Expected {expected_log[key]}, Found {found_log[key]}")
+        self.logger.error(f"Error in {key}: Expected {expected_log[key]}, Found {found_log[key]}")
     return count
     
 ## Inicia el logger y las funciones en un objeto      
@@ -73,5 +73,6 @@ class TestIdCtrl():
 ##id_ctrl_test = TestIdCtrl(logger,nvme)
 ##errors = id_ctrl_test.run()
 ##print(errors)
+
 
 
