@@ -106,7 +106,7 @@ class TestManager(object):
         if self.test:
             self.logger.debug(f"[====== Start Test: {self.testname} ======]")
             self.test.run()
-            self.logger.debud(f"[====== End test:   {self.testname} ======]")
+            self.logger.debug(f"[====== End test:   {self.testname} ======]")
         else:
             self.logger.error("No test defined.")
 
@@ -126,3 +126,4 @@ class TestManager(object):
 #    my_test.run()
 #    my_test.set_final_result()
 #    my_test.drive_check(discovery=False)
+
