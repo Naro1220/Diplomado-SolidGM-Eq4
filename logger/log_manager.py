@@ -77,6 +77,7 @@ class LogManager:
         """
 
         return self.logger
+
     def info(self, msg):
         self.logger.info(msg)
         
