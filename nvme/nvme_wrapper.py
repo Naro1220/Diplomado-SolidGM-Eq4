@@ -1,6 +1,7 @@
 import subprocess
 import json
 
+
 from logger.log_manager import LogManager
 
 class NvmeCommands():
@@ -203,6 +204,130 @@ class NvmeCommands():
 
         return cmd_output
     
+    def parse_identify_namespace(self, raw_data):
+        """
+        Parsea los datos raw de identify namespace y los convierte a formato legible
+        
+        Args:
+            raw_data: Datos binarios raw del comando identify namespace
+            
+        Returns:
+            str: Datos formateados de manera legible
+        """
+        if not raw_data or len(raw_data) < 4096:
+            return "Error: Datos insuficientes"
+        
+        # Convertir a bytes si es necesario
+        if isinstance(raw_data, str):
+            if all(c in '0123456789abcdefABCDEF \n' for c in raw_data):
+                raw_data = bytes.fromhex(raw_data.replace(' ', '').replace('\n', ''))
+            else:
+                raw_data = raw_data.encode()
+
+        try:
+            # Parsear los campos principales del Identify Namespace según NVMe spec
+            nsze = struct.unpack('<Q', raw_data[0:8])[0]
+            ncap = struct.unpack('<Q', raw_data[8:16])[0]
+            nuse = struct.unpack('<Q', raw_data[16:24])[0]
+            nsfeat = raw_data[24]
+            nlbaf = raw_data[25]
+            flbas = raw_data[26]
+            mc = raw_data[27]
+            dpc = raw_data[28]
+            dps = raw_data[29]
+            nmic = raw_data[30]
+            rescap = raw_data[31]
+            fpi = raw_data[32]
+            dlfeat = raw_data[33]
+            nawun = struct.unpack('<H', raw_data[34:36])[0]
+            nawupf = struct.unpack('<H', raw_data[36:38])[0]
+            nacwu = struct.unpack('<H', raw_data[38:40])[0]
+            nabsn = struct.unpack('<H', raw_data[40:42])[0]
+            nabo = struct.unpack('<H', raw_data[42:44])[0]
+            nabspf = struct.unpack('<H', raw_data[44:46])[0]
+            noiob = struct.unpack('<H', raw_data[46:48])[0]
+            
+            nvmcap = struct.unpack('<QQ', raw_data[48:64])
+            nvmcap_val = nvmcap[0] + (nvmcap[1] << 64)
+            
+            result = f"""nsze    : 0x{nsze:x}
+ncap    : 0x{ncap:x}
+nuse    : 0x{nuse:x}
+nsfeat  : 0x{nsfeat:x}
+nlbaf   : {nlbaf}
+flbas   : 0x{flbas:x}
+mc      : 0x{mc:x}
+dpc     : 0x{dpc:x}
+dps     : {dps}
+nmic    : {nmic}
+rescap  : 0x{rescap:x}
+fpi     : 0x{fpi:x}
+dlfeat  : {dlfeat}
+nawun   : {nawun}
+nawupf  : {nawupf}
+nacwu   : {nacwu}
+nabsn   : {nabsn}
+nabo    : {nabo}
+nabspf  : {nabspf}
+noiob   : {noiob}
+nvmcap  : {nvmcap_val}"""
+            
+            return result
+            
+        except Exception as e:
+            return f"Error parseando datos: {e}\nDatos raw recibidos: {len(raw_data)} bytes"
+
+    def nvme_id_ns(self, namespace_id=1):
+        """
+        Versión simplificada para solo obtener datos crudos
+        """
+        admin = AdminPassthru()
+        nvme_device = "/dev/nvme0"
+        self.logger.info(f"Ejecutando 'nvme id-ns' en {nvme_device} para namespace {namespace_id}")
+
+        output, err, returncode, status_dwords = admin.admin_passthru(
+            opcode = 0x06,
+            namespace_id = namespace_id,
+            data_len = 4096,
+            read = True,
+            device_path = nvme_device
+        )
+
+        if returncode == 0:
+            self.logger.info("Comando ejecutado exitosamente")
+        else:
+            self.logger.error(f"Error ejecutando comando. Return code: {returncode}")
+            if err:
+                self.logger.error(f"Error: {err}")
+            
+        return output, err, returncode, status_dwords
+
+    def nvme_id_ns_parsed(self, namespace_id=1):
+        """
+        Ejecuta admin-passthru para id-ns y parsea los datos
+        """
+        admin = AdminPassthru()
+        nvme_device = "/dev/nvme0"
+        self.logger.info(f"Ejecutando 'nvme id-ns' via admin-passthru en {nvme_device} para namespace {namespace_id}")
+
+        raw_output, err, returncode, status_dwords = admin.admin_passthru(
+            opcode = 0x06,
+            namespace_id = namespace_id,
+            data_len = 4096,
+            read = True,
+            device_path = nvme_device
+        )
+
+        if returncode == 0 and raw_output:
+            parsed_output = self.parse_identify_namespace(raw_output)
+            self.logger.info("Comando ejecutado exitosamente")
+            return parsed_output, raw_output, err, returncode, status_dwords
+        else:
+            self.logger.error(f"Error ejecutando comando. Return code: {returncode}")
+            if err:
+                self.logger.error(f"Error: {err}")
+            return None, raw_output, err, returncode, status_dwords
+  
 logger = LogManager("admin-passthru-test").get_logger()
 nvme = NvmeCommands("/dev/nvme0", logger)
 
