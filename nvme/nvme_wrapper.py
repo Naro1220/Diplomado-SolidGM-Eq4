@@ -202,7 +202,8 @@ class NvmeCommands():
         cmd_output = self._execute_cmd(cmd)
 
         return cmd_output
-    def create_ns(self, size, blocksize = 512):
+        
+    def create_ns(self, size):
         
         cmd = [ "nvme", "create-ns", self.device]
         
@@ -213,13 +214,7 @@ class NvmeCommands():
         
         cmd.append(nsze)
         cmd.append(ncap)
-        
-        if blocksize == 512:
-            cmd.append("--flbas=0")
-        else:
-            self.logger.error("Error blocksize no valido")
-            return None
-        #siguen mas 
+        cmd.append("--flbas=0")
         
         # Execute the command
         cmd_output = self._execute_cmd(cmd)
