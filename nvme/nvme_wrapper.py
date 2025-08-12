@@ -291,6 +291,32 @@ class NvmeCommands():
     
         self.logger.info(f"Namespace {nsID} deleted successfully.")
         return True
+        
+    def format(self, nsID, format):
+        
+        """
+        Change format from namespace from the NVMe device.
+        """
+        if nsID is None:
+            self.logger.error("No defined nsID")
+            return False
+    
+        cmd = ["nvme", "format"]
+        ns = self.device + f"n{nsID}"
+        lbaf = f"--lbaf={format}"
+        cmd.append(ns)
+        cmd.append(lbaf)
+        
+    
+        # Ejecutar el comando
+        cmd_output = self._execute_cmd(cmd)
+    
+        if cmd_output is None:
+            self.logger.error(f"Didn't format namespace {nsID}")
+            return False
+    
+        self.logger.info(f"Namespace {nsID} changed format successfully.")
+        return True
     
 logger = LogManager("nvme_wrapper").get_logger()
 nvme = NvmeCommands("/dev/nvme0", logger)
