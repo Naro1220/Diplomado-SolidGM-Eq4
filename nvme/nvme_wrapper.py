@@ -207,7 +207,7 @@ class NvmeCommands():
         
         cmd = [ "nvme", "create-ns", self.device]
         
-        calc =str(size // blocksize)
+        calc =str(size // 512)
         
         nsze = "--nsze=" + calc 
         ncap = "--ncap=" + calc
@@ -246,7 +246,8 @@ class NvmeCommands():
         if cmd_output == None:
             self.logger.error("Didn't execute Attach")  
             return False
-        return True
+        self.logger.info(cmd_output)
+        return True
 
     def detach_ns(self, nsID, controller="0"):
         """
@@ -289,7 +290,7 @@ class NvmeCommands():
             return False
     
         self.logger.info(f"Namespace {nsID} deleted successfully.")
-        return True
+        return True
     
 logger = LogManager("nvme_wrapper").get_logger()
 nvme = NvmeCommands("/dev/nvme0", logger)
