@@ -389,6 +389,23 @@ class AdminCommands:
                 "eui64": int.from_bytes(data[120:127], 'little')    # IEEE Extended Unique Identifier
             }
 
+            # Parse LBA formats (4 bytes each, starting at byte 128)
+            nlbaf_count = ns_info["nlbaf"] + 1
+            lbafs = []
+            for i in range(nlbaf_count):
+                entry_offset = 128 + (i * 4)
+                entry = int.from_bytes(data[entry_offset:entry_offset + 4], 'little')
+                ms = entry & 0xFFFF
+                lbads = (entry >> 16) & 0xFF
+                rp = (entry >> 24) & 0x3
+                lbafs.append({
+                    "ms": ms,                                       # Metadata Size (MS)
+                    "ds": lbads,                                    # LBA Data Size (LBADS)
+                    "rp": rp                                        # Relative Performance (RP)
+                })
+
+            ns_info["lbafs"] = lbafs
+
             return json.dumps(ns_info, indent=2)
         except Exception as ex:
             self.logger.error(f"Failed to parse Identify Namespace data: {ex}")
