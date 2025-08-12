@@ -317,9 +317,3 @@ class NvmeCommands():
     
         self.logger.info(f"Namespace {nsID} changed format successfully.")
         return True
-    
-logger = LogManager("nvme_wrapper").get_logger()
-nvme = NvmeCommands("/dev/nvme0", logger)
-
-out = nvme.id_ctrl()
-print(out)
