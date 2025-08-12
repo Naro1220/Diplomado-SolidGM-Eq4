@@ -391,6 +391,7 @@ class AdminCommands:
 
             # Parse LBA formats (4 bytes each, starting at byte 128)
             nlbaf_count = ns_info["nlbaf"] + 1
+            
             lbafs = []
             for i in range(nlbaf_count):
                 entry_offset = 128 + (i * 4)
@@ -398,13 +399,10 @@ class AdminCommands:
                 ms = entry & 0xFFFF
                 lbads = (entry >> 16) & 0xFF
                 rp = (entry >> 24) & 0x3
-                lbafs.append({
-                    "ms": ms,                                       # Metadata Size (MS)
-                    "ds": lbads,                                    # LBA Data Size (LBADS)
-                    "rp": rp                                        # Relative Performance (RP)
-                })
 
-            ns_info["lbafs"] = lbafs
+                ns_info[f"lbaf_{i}_ms"] = ms
+                ns_info[f"lbaf_{i}_ds"] = lbads
+                ns_info[f"lbaf_{i}_rp"] = rp
 
             return json.dumps(ns_info, indent=2)
         except Exception as ex:
