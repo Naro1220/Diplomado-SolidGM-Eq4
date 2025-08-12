@@ -231,7 +231,7 @@ class NvmeCommands():
         Attach a namespace to a controller.        
         """
         if nsID == None:
-            self.logger.error("No se dio nsID")             
+            self.logger.error("nsID not provided")             
             return False
         
     # Mandatory command structure: nvme id-ctrl {device_path}
@@ -244,9 +244,52 @@ class NvmeCommands():
 
         # Parse and convert the JSON formatted string to a dictionary
         if cmd_output == None:
-            self.logger.error("No se ejecuto el Attach")  
+            self.logger.error("Didn't execute Attach")  
             return False
         return True
+
+    def detach_ns(self, nsID, controller="0"):
+        """
+        Detach a namespace from a controller.
+        """
+        if nsID is None:
+            self.logger.error("nsID not provided")
+            return False
+    
+        cmd = ["nvme", "detach-ns", self.device]
+        cmd.append(f"-n {nsID}")
+        cmd.append(f"-c {controller}")
+    
+        # Ejecutar el comando
+        cmd_output = self._execute_cmd(cmd)
+    
+        if cmd_output is None:
+            self.logger.error(f"Didn't detach namespace {nsID}")
+            return False
+    
+        self.logger.info(f"Namespace {nsID} detached from controller {controller}")
+        return True
+
+    def delete_ns(self, nsID):
+        """
+        Delete a namespace from the NVMe device.
+        """
+        if nsID is None:
+            self.logger.error("No se dio nsID")
+            return False
+    
+        cmd = ["nvme", "delete-ns", self.device]
+        cmd.append(f"-n {nsID}")
+    
+        # Ejecutar el comando
+        cmd_output = self._execute_cmd(cmd)
+    
+        if cmd_output is None:
+            self.logger.error(f"Didn't delete namespace {nsID}")
+            return False
+    
+        self.logger.info(f"Namespace {nsID} deleted successfully.")
+        return True
     
 logger = LogManager("nvme_wrapper").get_logger()
 nvme = NvmeCommands("/dev/nvme0", logger)
