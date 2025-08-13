@@ -268,7 +268,7 @@ class AdminCommands:
                 "neile": int.from_bytes(info[176:192], 'little'), # Number of Error Information Log Entries
             }
 
-            return json.dumps(smart_log_dict, indent=2)
+            return smart_log_dict
         
         except Exception as ex:
             self.logger.error(f"Failed to parse SMART log: {ex}")
@@ -466,7 +466,7 @@ class AdminCommands:
                 "rab": info[72],                                           # Recommended Arbitration Burst
             }
 
-            return json.dumps(id_ctrl_dict, indent=2)
+            return id_ctrl_dict
         
         except Exception as ex:
             self.logger.error(f"Failed to parse Identify Controller data: {ex}")
