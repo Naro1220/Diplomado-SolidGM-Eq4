@@ -406,7 +406,7 @@ class AdminCommands:
 
             ns_info["lbafs"] = lbafs
 
-            return json.dumps(ns_info, indent=2)
+            return ns_info
         except Exception as ex:
             self.logger.error(f"Failed to parse Identify Namespace data: {ex}")
     
