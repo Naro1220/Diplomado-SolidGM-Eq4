@@ -314,3 +314,14 @@ class NvmeCommands():
             self.logger.error(f"Didn't format namespace {nsID}")
             return False
         return True
+
+    def get_feature(self, fid):
+        
+        cmd = ["nvme","get-feature", self.device,"-f"]
+        
+        cmd.append(f"{fid}")
+        cmd.append("-H")
+        
+        cmd_output = self._execute_cmd(cmd)
+        
+        return cmd_output
