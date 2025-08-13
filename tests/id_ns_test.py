@@ -2,7 +2,6 @@ from nvme.admin_passthru_wrapper import AdminCommands
 from logger.log_manager import LogManager
 from nvme.nvme_wrapper import NvmeCommands
 import subprocess
-import math
 
 ## Datos de nuestro NVME controller
 DEVICE = "/dev/nvme0"
@@ -128,7 +127,7 @@ class TestIdNs():
             errors += 1
             
         return errors
-    
+    """
 test = LogManager("test_id_namespace")
 logger = test.get_logger()
 admin = AdminCommands(device = DEVICE,logger = logger)
@@ -138,3 +137,5 @@ nvme = NvmeCommands(device = DEVICE, logger = logger)
 id_ns_test = TestIdNs(logger, nvme, admin)
 
 id_ns_test.run()
+
+"""
