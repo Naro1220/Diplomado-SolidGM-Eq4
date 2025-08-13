@@ -1,5 +1,5 @@
-from log_manager import LogManager
-from nvme_wrapper import NvmeCommands
+from logger.log_manager import LogManager
+from nvme.nvme_wrapper import NvmeCommands
 
 ## Datos de nuestro NVME controller
 DEVICE = "/dev/nvme0"
@@ -221,6 +221,7 @@ else:
     logger.info(f"TEST FAILED, {errors} error(s)")
   else:
     logger.error("ERROR: Can't validate")'''
+
 
 
 
