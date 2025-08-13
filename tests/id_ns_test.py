@@ -22,7 +22,7 @@ class TestIdNs():
     def run(self):
         
         # Toma una captura de id-ns antes de hacer modificaciones
-        snapshot_old = self.snapshot()
+        print(self.snapshot())
         
         # Borra todas las namespaces existentes
         if not (self.nvme.delete_ns(0XFFFFFFFF)):
@@ -56,7 +56,7 @@ class TestIdNs():
         
         #Guarda la nueva informacion
         snapshot_new = self.snapshot()
-        
+        print(snapshot_new)
         #Hace la validacion y regresa la cantidad de errores que encuentre
         self.errors += self.validate(nuse,snapshot_new,id,calc,BLOCKSIZE,FORMAT)
         if self.errors == 0:
@@ -139,3 +139,4 @@ id_ns_test = TestIdNs(logger, nvme, admin)
 id_ns_test.run()
 
 """
+
