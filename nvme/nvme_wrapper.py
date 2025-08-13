@@ -56,7 +56,7 @@ class NvmeCommands():
 
             return None
         
-    def id_ctrl(self, json_output=False):
+    def id_ctrl(self, json_output=False, vendor=False):
         """
         Retrieves the controller identification data of the NVMe device.
 
@@ -73,9 +73,11 @@ class NvmeCommands():
                 - A raw string if `json_output=False` and the command succeeds.
                 - None if the command fails or output is empty.
         """
-
         # Mandatory command structure: nvme id-ctrl {device_path}
-        cmd = ["nvme", "id-ctrl", self.device]
+        if vendor:
+            cmd = ["nvme", "solidigm", "id-ctrl", self.device]
+        else:
+            cmd = ["nvme", "id-ctrl", self.device]
 
         # Set output format to JSON if requested. 
         if json_output:
