@@ -203,11 +203,11 @@ class NvmeCommands():
 
         return cmd_output
         
-    def create_ns(self, size):
+    def create_ns(self, size, blocksize):
         
         cmd = [ "nvme", "create-ns", self.device]
         
-        calc =str(size // 512)
+        calc =str(size // blocksize)
         
         nsze = "--nsze=" + calc 
         ncap = "--ncap=" + calc
@@ -218,13 +218,12 @@ class NvmeCommands():
         
         # Execute the command
         cmd_output = self._execute_cmd(cmd)
-        self.logger.info(cmd_output)
         nsid = ""
         for char in cmd_output:
             if char.isdigit():
                 nsid += char
 
-        return nsid
+        return nsid, calc
     
     def attach_ns(self, nsID, controller="0"):
         """
@@ -246,7 +245,6 @@ class NvmeCommands():
         if cmd_output == None:
             self.logger.error("Didn't execute Attach")  
             return False
-        self.logger.info(cmd_output)
         return True
 
     def detach_ns(self, nsID, controller="0"):
@@ -289,7 +287,6 @@ class NvmeCommands():
             self.logger.error(f"Didn't delete namespace {nsID}")
             return False
     
-        self.logger.info(f"Namespace {nsID} deleted successfully.")
         return True
         
     def format(self, nsID, format):
@@ -314,6 +311,4 @@ class NvmeCommands():
         if cmd_output is None:
             self.logger.error(f"Didn't format namespace {nsID}")
             return False
-    
-        self.logger.info(f"Namespace {nsID} changed format successfully.")
         return True
