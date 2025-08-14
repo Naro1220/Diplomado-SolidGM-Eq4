@@ -1,5 +1,6 @@
 # 💻 Framework para validar SSD NVMe
-UNIVERSIDAD DE GUADALAJARA - SOLIDIGM
+UNIVERSIDAD DE GUADALAJARA - SOLIDIGM    
+
 CENTRO UNIVERSITARIO DE CIENCIAS EXACTAS E INGENIERÍAS (CUCEI)
 
 **Descripción**:
@@ -29,5 +30,6 @@ Sistema de monitoreo y optimización de unidades NVMe mediante la integración d
 - Fernando Jair Landeros 
 
 - Raul Sampablo 
+
 
 
