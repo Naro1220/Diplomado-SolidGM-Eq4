@@ -152,6 +152,8 @@ class AdminCommands:
         # Add the Dataflow Direction to Receive option to the command.
         if read:
             cmd.append("--read")
+        else:
+            cmd.append("--write")
 
         # Execute the command
         cmd_stdout, cmd_stderr = self._execute_cmd(cmd)
@@ -496,7 +498,8 @@ class AdminCommands:
                 opcode=ADMIN_CMD_OPCODE_SETFEATURES,
                 nsid=nsid,
                 cdw10=cdw10,
-                cdw11=value
+                cdw11=value,
+                read=False
             )
 
             return result
