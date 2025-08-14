@@ -1,35 +1,40 @@
+import json
 from logger.log_manager import LogManager
 from nvme.nvme_wrapper import NvmeCommands
 
-## Datos de nuestro NVME controller
+## NVME controller data
 DEVICE = "/dev/nvme0"
 NVME = "nvme"
 
-## Datos del resultado del comando id-ctrl que debemos ignorar
+#Results of id-ctrl command to ignore 
 IGNORE_LIST = ['sn', 'fguid', 'unvmcap', 'subnqn']
 
-##Resultado de otro NVME controller para comparar
-##Leemos el archivo json del resultado esperado
-ruta_json = 'expected_log.json'
-
-try:
-    ##Si logra leerlo, lo guardara en la variable EXPECTED_LOG
-    with open(ruta_json, 'r') as archivo_json:
-        EXPECTED_LOG = json.load(archivo_json)
-except FileNotFoundError:
-    ##Sino encuentra el archivo, arroja el siguiente error
-    print(f"Error: El archivo {ruta_json} no se encontró.")
-
-## Clase para hacer la prueba
 class TestIdCtrl():
 
   ## Da nuestro logger y las funciones de NVME a la clase
-  def __init__(self, logger, nvme):
+  def __init__(self, logger, nvme, admin, log_path="tests/expected_log.json"):
     self.logger = logger
     self.nvme = nvme
-    self.errors = 0 #Variable para guardar los errores o no coincidencias
+    self.admin = admin
+    self.errors = 0 #Error count
+    self.expected_log = None
+
+    #Get the expected json file 
+    try:
+      with open(log_path, 'r') as archivo_json:
+        self.expected_log = json.load(archivo_json)
+      self.logger.debug(f"Expected log loaded from {log_path}")
+    except FileNotFoundError:
+      self.logger.error(f"Expected log file not found: {log_path}")
+    except json.JSONDecodeError as e:
+      self.logger.error(f"Error decoding JSON from {log_path}: {e}")
+
 
   def run(self):
+
+    if self.expected_log is None:
+      self.logger.error("No expected log loaded. Cannot run validation.")
+      return False
 
     ## Manda el comando id-ctrl en formato json al controlador y guarda el diccionario
     found_log = self.nvme.id_ctrl(json_output=True)
@@ -40,7 +45,7 @@ class TestIdCtrl():
       self.logger.error("Command Failed")
       return False
     self.logger.info("Command Succeeded")
-    self.errors = self.validate(EXPECTED_LOG, found_log)
+    self.errors = self.validate(self.expected_log, found_log)
     if self.errors == 0:
         self.logger.info("TEST PASSED, 0 errors")
         return True
@@ -70,32 +75,3 @@ class TestIdCtrl():
         count += 1
         self.logger.error(f"Error: Expected {expected_log[key]}, Found {found_log[key]}")
     return count
-'''   
-## Inicia el logger y las funciones en un objeto      
-test = LogManager("test_id_control")
-logger = test.get_logger()
-nvme = NvmeCommands(device = DEVICE, logger = logger)
-
-## Crea un objeto con las funciones de esta prueba, y lo corre
-id_ctrl_test = TestIdCtrl(logger,nvme)
-found_log = id_ctrl_test.run()
-
-## Checa si hubo algun error al ejecutar el comando
-if found_log == None:
-  logger.error("ERROR in command")
-
-## Compara ambos diccionarios, ve si hubo errores al comparar, o si hubo errores por diferencia de datos
-else:
-  errors = id_ctrl_test.validate(EXPECTED_LOG,found_log)
-  if errors == 0:
-    logger.info("TEST PASSED, 0 errors")
-  elif errors > 0:
-    logger.info(f"TEST FAILED, {errors} error(s)")
-  else:
-    logger.error("ERROR: Can't validate")'''
-
-
-
-
-
-
